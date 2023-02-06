@@ -1,0 +1,8 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:focus {
+  outline: none;
+  @apply ring-neutral-500 ring-1;
+}
