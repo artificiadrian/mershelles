@@ -134,16 +134,25 @@ type UploadResponse = {
 export const upload = async (file: File) =>
   request<UploadRequest, UploadResponse>({ type: "upload", file })
 
-type DownloadRequest = {
-  path: string
+export const download = async (path: string) => {
+  const form = document.createElement("form")
+  form.method = "POST"
+  form.action = "http://localhost:8080" // todo change to relative path
+  form.target = "_blank"
+  form.style.display = "none"
+  const addInput = (name: string, value: string) => {
+    const input = document.createElement("input")
+    input.name = name
+    input.value = value
+    form.appendChild(input)
+  }
+  addInput("path", path)
+  addInput("cwd", useInfoStore.getState()?.cwd || "")
+  addInput("type", "download")
+  document.body.appendChild(form)
+  form.submit()
+  form.remove()
 }
-
-type DownloadResponse = {
-  downloadUrl: string
-}
-
-export const download = async (path: string) =>
-  request<DownloadRequest, DownloadResponse>({ type: "download", path })
 
 type LsRequest = {
   path: string

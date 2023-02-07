@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { create } from "zustand"
-import { exec, FileInfo, ls } from "./api/api"
+import { download, exec, FileInfo, ls } from "./api/api"
 import { useInfoStore } from "./api/store"
 
 type FileBrowserState = {
@@ -77,13 +77,6 @@ function FileEntry({ file }: { file: FileInfo }) {
     }
   }
 
-  function download() {
-    window.open(
-      `http://localhost:8080?cwd=${cwd}&download=${file.name}`,
-      "_blank"
-    )
-  }
-
   return (
     <tr
       onClick={file.isDir ? cd : undefined}
@@ -104,7 +97,7 @@ function FileEntry({ file }: { file: FileInfo }) {
         <td></td>
       ) : (
         <td
-          onClick={download}
+          onClick={async () => await download(file.name)}
           className="py-1 text-neutral-500 text-xs hover:underline cursor-pointer"
         >
           Download

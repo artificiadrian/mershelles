@@ -34,7 +34,7 @@ export default function Shell() {
       return true
     } else if (command.startsWith("download")) {
       const path = command.split(" ")[1]
-      window.open(`http://localhost:8080?cwd=${cwd}&download=${path}`, "_blank")
+      await download(path)
       log({ type: "output", output: `Trying to download ${path}` })
       return true
     }

