@@ -34,7 +34,7 @@ export default function Auth({ children }: Props) {
             ></input>
           </div>
           <button
-            disabled={!password || isLoading}
+            disabled={isLoading}
             onClick={onClick}
             className="rounded p-1 px-4 bg-primary-600 disabled:bg-neutral-700 disabled:text-neutral-500"
           >

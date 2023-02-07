@@ -1,21 +1,39 @@
-import { useRef } from "react"
 import { useCurrentCommandStore } from "./api/current-command.store"
-import {
-  LogLine,
-  LogLineError,
-  LogLineInput,
-  LogLineOutput,
-  useLogStore,
-} from "./api/log.store"
+import { LogLine, useLogStore } from "./api/log.store"
+import { useVirtualizer } from "@tanstack/react-virtual"
 
-export default function Log() {
+export default function Log({
+  parentRef,
+}: {
+  parentRef: React.RefObject<HTMLDivElement>
+}) {
   const { buffer } = useLogStore()
   const { isExecuting, currentCommand } = useCurrentCommandStore()
+
+  const virtualizer = useVirtualizer({
+    count: buffer.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 20,
+  })
+
   return (
     <>
-      {buffer.map((line, i) => (
-        <LogLineItem key={i} line={line} />
-      ))}
+      {virtualizer.getVirtualItems().map((virtualItem) => {
+        return (
+          <div
+            key={virtualItem.index}
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "100%",
+              transform: `translateY(${virtualItem.start}px)`,
+            }}
+          >
+            <LogLineItem line={buffer[virtualItem.index]} />
+          </div>
+        )
+      })}
       {isExecuting && (
         <p>
           <span className="text-neutral-500">Executing</span> {currentCommand}
@@ -27,24 +45,12 @@ export default function Log() {
 
 function LogLineItem({ line }: { line: LogLine }) {
   if (line.type === "input") {
-    return <LogLineInputItem line={line as LogLineInput} />
+    return <p className="text-neutral-500">{line.command}</p>
   } else if (line.type === "output") {
-    return <LogLineOutputItem line={line as LogLineOutput} />
+    return <p>{line.output}</p>
   } else if (line.type === "error") {
-    return <LogLineErrorItem line={line as LogLineError} />
+    return <p className="text-red-500">{line.error}</p>
   }
 
-  return <div>wtf?</div>
-}
-
-function LogLineInputItem({ line }: { line: LogLineInput }) {
-  return <p className="text-neutral-500">{line.command}</p>
-}
-
-function LogLineOutputItem({ line }: { line: LogLineOutput }) {
-  return <p>{line.output}</p>
-}
-
-function LogLineErrorItem({ line }: { line: LogLineError }) {
-  return <p className="text-red-500">{line.error}</p>
+  return <p>unknown log line: {JSON.stringify(line)}</p>
 }

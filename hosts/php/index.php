@@ -1,6 +1,10 @@
 <?php
 
-$password = "test"; // todo change;
+$password = "@@PASSWORD@@";
+$password = "test"; // todo remove
+if ($password === "@@PASS" . "WORD@@") {
+    $password = "";
+}
 define("PASSWORD", $password);
 
 function respond($code, $data)
@@ -71,6 +75,17 @@ function handleInit()
     ));
 }
 
+function checkAuth()
+{
+    if (PASSWORD === "") {
+        return; // no auth needed
+    }
+
+    if ($_POST["password"] !== PASSWORD) {
+        respond(401, array("error" => "Invalid password"));
+    }
+}
+
 function handleAuth()
 {
     if ($_POST["password"] === PASSWORD) {
@@ -86,8 +101,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $type = $_POST["type"];
 
     // check password
-    if ($type !== "auth" && $_POST["password"] !== PASSWORD) {
-        respond(401, array("error" => "Invalid password"));
+    if ($type !== "auth") {
+        checkAuth();
     }
 
     switch ($type) {
