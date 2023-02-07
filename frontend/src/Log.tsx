@@ -1,13 +1,14 @@
 import { useCurrentCommandStore } from "./api/current-command.store"
 import { LogLine, useLogStore } from "./api/log.store"
 import { useVirtualizer } from "@tanstack/react-virtual"
+import { useEffect } from "react"
 
 export default function Log({
   parentRef,
 }: {
   parentRef: React.RefObject<HTMLDivElement>
 }) {
-  const { buffer } = useLogStore()
+  const { buffer, setOnLog } = useLogStore()
   const { isExecuting, currentCommand } = useCurrentCommandStore()
 
   function estimateSize(index: number) {
@@ -19,6 +20,18 @@ export default function Log({
     getScrollElement: () => parentRef.current,
     estimateSize,
   })
+
+  useEffect(() => {
+    setOnLog(() => {
+      setTimeout(() => {
+        virtualizer.scrollToOffset(virtualizer.getTotalSize())
+      }, 1)
+    })
+
+    return () => {
+      setOnLog(() => {})
+    }
+  }, [])
 
   return (
     <>

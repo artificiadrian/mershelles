@@ -6,12 +6,20 @@ import { useLogStore } from "./api/log.store"
 import { useInfoStore } from "./api/store"
 import Log from "./Log"
 
+function minifyCwd(cwd: string) {
+  const parts = cwd.split("/")
+  if (parts.length <= 2) return cwd
+  const miniParts = parts.map((p) => p[0])
+  return miniParts.join("/").slice(0, -1) + parts[parts.length - 1]
+}
+
 export default function Shell() {
   const { username, hostname, cwd } = useInfoStore()
   const { isExecuting, execute, done, currentCommand } =
     useCurrentCommandStore()
   const { clear, log } = useLogStore()
   const logRef = useRef<HTMLDivElement>(null)
+  const minifiedCwd = minifyCwd(cwd)
 
   function interceptCommand(command: string) {
     command = command.trim()
@@ -39,12 +47,14 @@ export default function Shell() {
 
     const response = await exec(command)
     log({ type: "input", command })
+
     if (response.success) {
-      response.output
-        .split("\n")
-        .forEach((line) => log({ type: "output", output: line }))
       if (response.output.length === 0) {
         log({ type: "output", output: "No output." })
+      } else {
+        response.output
+          .split("\n")
+          .forEach((line) => log({ type: "output", output: line }))
       }
     } else {
       log({ type: "error", error: response.error })
@@ -61,12 +71,12 @@ export default function Shell() {
         <div className="rounded-bl-xl text-sm">
           {username}@{hostname}
         </div>
-        <div className="mx-4 font-bold text-sm">{cwd}</div>
+        <div className="mx-4 font-bold text-sm">{minifiedCwd}</div>
         <input
           disabled={isExecuting}
           onKeyDown={onSubmit}
           type="text"
-          className="w-full p-4 rounded-br-xl bg-neutral-900"
+          className="flex-1 p-4 rounded-br-xl bg-neutral-900"
           placeholder={
             isExecuting ? `Executing ${currentCommand} ...` : "Enter command"
           }

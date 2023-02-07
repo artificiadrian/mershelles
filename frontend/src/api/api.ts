@@ -8,6 +8,8 @@
  * download -> download file
  */
 
+import { useInfoStore } from "./store"
+
 type RequestType =
   | "init"
   | "auth"
@@ -19,15 +21,19 @@ type RequestType =
 
 type Request = {
   type: RequestType
-  password?: string
 }
 
-type ErrorResponse = {
+type Response = {
+  success: boolean
+  cwd: string
+}
+
+type ErrorResponse = Response & {
   success: false
   error: string
 }
 
-type SuccessResponse = {
+type SuccessResponse = Response & {
   success: true
 }
 
@@ -56,6 +62,7 @@ export async function request<TRequest, TResponse>(
   })
   formData.append("delimiter", delimiter)
   formData.append("password", sessionStorage.getItem("password") || "")
+  formData.append("cwd", useInfoStore.getState()?.cwd || "")
 
   if (file) {
     formData.append("file", file)
@@ -71,7 +78,13 @@ export async function request<TRequest, TResponse>(
   const start = text.indexOf(startDelimiter) + startDelimiter.length
   const end = text.indexOf(endDelimiter)
   const encoded = text.substring(start, end)
-  return JSON.parse(atob(encoded))
+  const response = JSON.parse(atob(encoded)) as
+    | (TResponse & SuccessResponse)
+    | ErrorResponse
+  if (response.success) {
+    useInfoStore.setState({ cwd: response.cwd })
+  }
+  return response
 }
 
 type InitResponse = {

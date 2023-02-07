@@ -4,6 +4,8 @@ type LogState = {
   buffer: LogLine[]
   log: (line: LogLine) => void
   clear: () => void
+  onLog: (line: LogLine) => void
+  setOnLog: (onLog: (line: LogLine) => void) => void
 }
 
 type LogLineType = "input" | "error" | "output"
@@ -37,7 +39,10 @@ export const useLogStore = create<LogState>((set) => ({
       if (newBuffer.length > 1024) {
         newBuffer.shift()
       }
+      state.onLog(line)
       return { buffer: newBuffer }
     }),
   clear: () => set({ buffer: [] }),
+  onLog: (line: LogLine) => {},
+  setOnLog: (onLog: (line: LogLine) => void) => set({ onLog }),
 }))
