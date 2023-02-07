@@ -1,8 +1,8 @@
-import { useRef } from "react"
+import { useEffect, useRef } from "react"
 import { create } from "zustand"
-import { exec } from "./api/api"
+import { download, exec, InitResponse } from "./api/api"
 import { useCurrentCommandStore } from "./api/current-command.store"
-import { useLogStore } from "./api/log.store"
+import { LogLine, useLogStore } from "./api/log.store"
 import { useInfoStore } from "./api/store"
 import Log from "./Log"
 
@@ -14,20 +14,28 @@ function minifyCwd(cwd: string) {
 }
 
 export default function Shell() {
-  const { username, hostname, cwd } = useInfoStore()
+  const { info, cwd } = useInfoStore()
   const { isExecuting, execute, done, currentCommand } =
     useCurrentCommandStore()
   const { clear, log } = useLogStore()
   const logRef = useRef<HTMLDivElement>(null)
   const minifiedCwd = minifyCwd(cwd)
 
-  function interceptCommand(command: string) {
+  async function interceptCommand(command: string) {
     command = command.trim()
     if (command === "clear") {
       clear()
       return true
     } else if (command === "") {
       log({ type: "output", output: "" })
+      return true
+    } else if (command === "help") {
+      log({ type: "help" })
+      return true
+    } else if (command.startsWith("download")) {
+      const path = command.split(" ")[1]
+      window.open(`http://localhost:8080?cwd=${cwd}&download=${path}`, "_blank")
+      log({ type: "output", output: `Trying to download ${path}` })
       return true
     }
     return false
@@ -40,7 +48,7 @@ export default function Shell() {
     target.value = ""
     execute(command)
 
-    if (interceptCommand(command)) {
+    if (await interceptCommand(command)) {
       done()
       return
     }
@@ -72,7 +80,10 @@ export default function Shell() {
       </div>
       <div className="border-t border-neutral-700 flex flex-col items-stretch md:flex-row md:items-baseline  md:pl-4 md:rounded-bl-xl">
         <div className="px-2 md:p-0 md:rounded-bl-xl text-xs md:text-sm">
-          {username}@{hostname}
+          <span className={`${info.isSuperUser ? "text-red-500" : ""}`}>
+            {info.username}
+          </span>
+          @{info.hostname}
         </div>
         <div className=" px-2 md:p-0 md:mx-4 font-bold text-xs md:text-sm">
           {minifiedCwd}

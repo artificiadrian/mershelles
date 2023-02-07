@@ -1,24 +1,53 @@
-import { useState } from "react"
-import { auth } from "./api/api"
-import { useAuthStore } from "./api/store"
+import { useEffect, useState } from "react"
+import { auth, init, InitResponse } from "./api/api"
+import { LogLine, useLogStore } from "./api/log.store"
+import { useAuthStore, useInfoStore } from "./api/store"
 
 type Props = {
   children: React.ReactNode
 }
 
+function welcome(info: InitResponse, log: (line: LogLine) => void) {
+  log({
+    type: "output",
+    output: `Welcome to Mershelles on ${info.os} ${info.release} ${info.machine} ${info.version}`,
+  })
+  log({ type: "help" })
+}
+
 export default function Auth({ children }: Props) {
   const { authenticated, login } = useAuthStore()
-  const [password, setPassword] = useState("")
+  const { log, clear } = useLogStore()
+  const { setInfo } = useInfoStore()
+  const [password, setPassword] = useState(
+    localStorage.getItem("mershelles") || ""
+  )
   const [isLoading, setIsLoading] = useState(false)
 
   async function onClick() {
     setIsLoading(true)
     const response = await auth(password)
     if (response.success) {
-      login(password)
+      await initMershelles()
     }
     setIsLoading(false)
   }
+
+  async function initMershelles() {
+    setIsLoading(true)
+    const response = await init()
+    if (response.success) {
+      setInfo(response)
+      clear()
+      welcome(response, log)
+      login()
+    }
+    setIsLoading(false)
+  }
+
+  useEffect(() => {
+    initMershelles().then(() => {})
+  }, [])
 
   if (!authenticated) {
     return (
@@ -36,7 +65,7 @@ export default function Auth({ children }: Props) {
           <button
             disabled={isLoading}
             onClick={onClick}
-            className="rounded p-1 px-4 bg-primary-600 disabled:bg-neutral-700 disabled:text-neutral-500"
+            className="mt-4 w-full rounded p-1 px-4 bg-primary-600 disabled:bg-neutral-700 disabled:text-neutral-500"
           >
             {isLoading ? "Loading..." : "Login"}
           </button>

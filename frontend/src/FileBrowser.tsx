@@ -34,7 +34,7 @@ export default function FileBrowser() {
   }, [cwd])
 
   return (
-    <div className="font-mono h-full flex flex-col md:px-4 md:pb-4">
+    <div className="text-sm md:text-base font-mono h-full flex flex-col p-2 md:p-4 pt-0 md:pt-0">
       <Path />
       <div className="flex-1 overflow-auto">
         <FileList />
@@ -53,6 +53,7 @@ function FileList() {
           <th className="text-start pr-8">Name</th>
           <th className="text-start pr-8">Size</th>
           <th className="text-start pr-8">Last Modified</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
@@ -65,7 +66,7 @@ function FileList() {
 }
 
 function FileEntry({ file }: { file: FileInfo }) {
-  const { setCwd } = useInfoStore()
+  const { setCwd, cwd } = useInfoStore()
   async function cd() {
     const response = await exec(`cd ${file.name}`)
     const newCwd = response.cwd
@@ -75,22 +76,40 @@ function FileEntry({ file }: { file: FileInfo }) {
       return
     }
   }
+
+  function download() {
+    window.open(
+      `http://localhost:8080?cwd=${cwd}&download=${file.name}`,
+      "_blank"
+    )
+  }
+
   return (
     <tr
-      onClick={cd}
+      onClick={file.isDir ? cd : undefined}
       className={`${
         file.isDir ? "cursor-pointer group transition hover:bg-neutral-800" : ""
       }`}
     >
-      <td className="pr-8">
+      <td className="pr-8 py-1">
         {file.isDir ? "d" : "-"}
         {file.mode}
       </td>
-      <td className="group-hover:underline pr-8">{file.name}</td>
-      <td className="pr-8">{file.size}</td>
-      <td className="pr-8">
+      <td className="pr-8 py-1 group-hover:underline ">{file.name}</td>
+      <td className="pr-8 py-1 text-neutral-400">{file.size}</td>
+      <td className="pr-8 py-1 text-neutral-400">
         {new Date(file.lastModified * 1000).toISOString()}
       </td>
+      {file.isDir ? (
+        <td></td>
+      ) : (
+        <td
+          onClick={download}
+          className="py-1 text-neutral-500 text-xs hover:underline cursor-pointer"
+        >
+          Download
+        </td>
+      )}
     </tr>
   )
 }

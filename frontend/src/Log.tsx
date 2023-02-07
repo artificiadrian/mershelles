@@ -1,7 +1,13 @@
 import { useCurrentCommandStore } from "./api/current-command.store"
-import { LogLine, useLogStore } from "./api/log.store"
+import { LogLine, LogLineType, useLogStore } from "./api/log.store"
 import { useVirtualizer } from "@tanstack/react-virtual"
 import { useEffect } from "react"
+
+const estimateLogSize = (type: LogLineType) => {
+  if (type === "input") return 30
+  if (type === "help") return 150
+  return 20
+}
 
 export default function Log({
   parentRef,
@@ -12,7 +18,7 @@ export default function Log({
   const { isExecuting, currentCommand } = useCurrentCommandStore()
 
   function estimateSize(index: number) {
-    return buffer[index].type === "input" ? 30 : 20
+    return estimateLogSize(buffer[index].type)
   }
 
   const virtualizer = useVirtualizer({
@@ -76,7 +82,47 @@ function LogLineItem({ line }: { line: LogLine }) {
     return <pre>{line.output}</pre>
   } else if (line.type === "error") {
     return <pre className="text-red-500">{line.error}</pre>
+  } else if (line.type === "help") {
+    return <LogHelp />
   }
 
   return <pre>unknown log line: {JSON.stringify(line)}</pre>
+}
+
+function LogHelp() {
+  return (
+    <div className="bg-neutral-800 py-2 my-2">
+      <CommandHelp name={"clear"} description={"Clear log"}></CommandHelp>
+      <CommandHelp name={"help"} description={"Show help"}></CommandHelp>
+      <CommandHelp
+        name={"download <path>"}
+        description={"Download file"}
+      ></CommandHelp>
+      <CommandHelp
+        name={"upload <path>"}
+        description={"Upload file to path"}
+      ></CommandHelp>
+      <CommandHelp
+        name={"eval <code>"}
+        description={"Eval php code"}
+      ></CommandHelp>
+    </div>
+  )
+}
+
+function CommandHelp({
+  name,
+  description,
+}: {
+  name: string
+  description: string
+}) {
+  return (
+    <>
+      <pre>
+        <span className="text-primary-300 w-48"> {name}</span>
+        <span className="text-neutral-300"> - {description}</span>
+      </pre>
+    </>
+  )
 }

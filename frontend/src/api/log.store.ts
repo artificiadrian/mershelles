@@ -8,13 +8,13 @@ type LogState = {
   setOnLog: (onLog: (line: LogLine) => void) => void
 }
 
-type LogLineType = "input" | "error" | "output"
+export type LogLineType = "input" | "error" | "output" | "help"
 
 export type LogLineBase = {
   type: LogLineType
 }
 
-export type LogLine = LogLineInput | LogLineError | LogLineOutput
+export type LogLine = LogLineInput | LogLineError | LogLineOutput | LogLineHelp
 
 export type LogLineInput = LogLineBase & {
   type: "input"
@@ -24,6 +24,10 @@ export type LogLineInput = LogLineBase & {
 export type LogLineError = LogLineBase & {
   type: "error"
   error: string
+}
+
+export type LogLineHelp = LogLineBase & {
+  type: "help"
 }
 
 export type LogLineOutput = LogLineBase & {

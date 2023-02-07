@@ -1,32 +1,43 @@
 import { create } from "zustand"
+import { InitResponse } from "./api"
 
 type AuthStore = {
   authenticated: boolean
-  login: (password: string) => void
+  login: () => void
   logout: () => void
 }
 
 export const useAuthStore = create<AuthStore>((set) => ({
   authenticated: false,
-  login: (password: string) => {
+  login: () => {
     set({ authenticated: true })
-    sessionStorage.setItem("password", password)
   },
   logout: () => {
-    sessionStorage.removeItem("password")
+    set({ authenticated: false })
+    document.cookie = ""
   },
 }))
 
 type InfoStore = {
-  username: string
-  hostname: string
+  info: InitResponse
   cwd: string
   setCwd: (cwd: string) => void
+  setInfo: (info: InitResponse) => void
 }
 
 export const useInfoStore = create<InfoStore>((set) => ({
-  username: "?",
-  hostname: "?",
   cwd: "?",
+  info: {
+    cwd: "?",
+    hostname: "?",
+    isSuperUser: false,
+    machine: "?",
+    os: "?",
+    release: "?",
+    version: "?",
+    writeable: false,
+    username: "?",
+  },
   setCwd: (cwd: string) => set({ cwd }),
+  setInfo: (info: InitResponse) => set({ info }),
 }))

@@ -61,9 +61,6 @@ export async function request<TRequest, TResponse>(
     formData.append(key, rest[key])
   })
   formData.append("delimiter", delimiter)
-  if (request.type !== "auth") {
-    formData.append("password", sessionStorage.getItem("password") || "")
-  }
   formData.append("cwd", useInfoStore.getState()?.cwd || "")
 
   if (file) {
@@ -86,11 +83,20 @@ export async function request<TRequest, TResponse>(
   if (response.success) {
     useInfoStore.setState({ cwd: response.cwd })
   }
+  console.log(response)
   return response
 }
 
-type InitResponse = {
-  authNeeded: boolean
+export type InitResponse = {
+  cwd: string
+  hostname: string
+  isSuperUser: false
+  machine: string
+  os: string
+  release: string
+  version: string
+  writeable: boolean
+  username: string
 }
 
 type AuthRequest = {

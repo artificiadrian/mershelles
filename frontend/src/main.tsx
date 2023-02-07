@@ -8,3 +8,9 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
     <App />
   </React.StrictMode>
 )
+
+/*
+ * cleanup log and all files etc
+ * php session with cookie and auth call
+ * cleanup php code
+ */
