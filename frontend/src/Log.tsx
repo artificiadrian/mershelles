@@ -71,12 +71,12 @@ export default function Log({
 
 function LogLineItem({ line }: { line: LogLine }) {
   if (line.type === "input") {
-    return <p className="text-neutral-500 pt-2">{line.command}</p>
+    return <pre className="text-neutral-500 pt-2">{line.command}</pre>
   } else if (line.type === "output") {
-    return <p>{line.output}</p>
+    return <pre>{line.output}</pre>
   } else if (line.type === "error") {
-    return <p className="text-red-500">{line.error}</p>
+    return <pre className="text-red-500">{line.error}</pre>
   }
 
-  return <p>unknown log line: {JSON.stringify(line)}</p>
+  return <pre>unknown log line: {JSON.stringify(line)}</pre>
 }

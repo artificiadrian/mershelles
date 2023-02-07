@@ -61,7 +61,9 @@ export async function request<TRequest, TResponse>(
     formData.append(key, rest[key])
   })
   formData.append("delimiter", delimiter)
-  formData.append("password", sessionStorage.getItem("password") || "")
+  if (request.type !== "auth") {
+    formData.append("password", sessionStorage.getItem("password") || "")
+  }
   formData.append("cwd", useInfoStore.getState()?.cwd || "")
 
   if (file) {

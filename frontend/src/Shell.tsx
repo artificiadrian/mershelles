@@ -63,20 +63,25 @@ export default function Shell() {
   }
 
   return (
-    <div className="bg-neutral-900 rounded-xl shadow-2xl flex-1 flex flex-col font-mono">
-      <div ref={logRef} className="flex-1 overflow-auto p-4">
+    <div className="font-mono h-full flex flex-col">
+      <div
+        ref={logRef}
+        className="flex-1 overflow-auto md:p-4 p-2 text-xs md:text-base"
+      >
         <Log parentRef={logRef} />
       </div>
-      <div className="border-t border-t-neutral-700 flex flex-row items-baseline pl-4 bg-neutral-800 rounded-bl-xl">
-        <div className="rounded-bl-xl text-sm">
+      <div className="border-t border-neutral-700 flex flex-col items-stretch md:flex-row md:items-baseline  md:pl-4 md:rounded-bl-xl">
+        <div className="px-2 md:p-0 md:rounded-bl-xl text-xs md:text-sm">
           {username}@{hostname}
         </div>
-        <div className="mx-4 font-bold text-sm">{minifiedCwd}</div>
+        <div className=" px-2 md:p-0 md:mx-4 font-bold text-xs md:text-sm">
+          {minifiedCwd}
+        </div>
         <input
           disabled={isExecuting}
           onKeyDown={onSubmit}
           type="text"
-          className="flex-1 p-4 rounded-br-xl bg-neutral-900"
+          className="md:flex-1 text-xs md:text-base border-t md:border-t-0 md:border-l transition border-neutral-700  p-2 md:p-4 md:rounded-br-xl bg-neutral-900"
           placeholder={
             isExecuting ? `Executing ${currentCommand} ...` : "Enter command"
           }
