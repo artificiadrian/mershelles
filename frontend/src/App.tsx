@@ -2,6 +2,7 @@ import { useEffect } from "react"
 import { useLogStore } from "./api/log.store"
 import { Tab, useTabStore } from "./api/tab.store"
 import Auth from "./Auth"
+import FileBrowser from "./FileBrowser"
 import Shell from "./Shell"
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
           <Toolbar />
           <div className="h-[calc(100%-2rem)] md:h-[calc(100%-3rem)]">
             {currentTab === "shell" && <Shell />}
+            {currentTab === "file-browser" && <FileBrowser />}
           </div>
         </div>
       </Auth>

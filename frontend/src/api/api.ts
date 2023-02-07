@@ -13,11 +13,11 @@ import { useInfoStore } from "./store"
 type RequestType =
   | "init"
   | "auth"
-  | "logout"
   | "destroy"
   | "exec"
   | "upload"
   | "download"
+  | "ls"
 
 type Request = {
   type: RequestType
@@ -103,7 +103,6 @@ export const init = async () => request<_, InitResponse>({ type: "init" })
 
 export const auth = async (password: string) =>
   request<AuthRequest, _>({ type: "auth", password })
-export const logout = async () => request<_, _>({ type: "logout" })
 
 export const destroy = async () => request<_, _>({ type: "destroy" })
 
@@ -139,3 +138,22 @@ type DownloadResponse = {
 
 export const download = async (path: string) =>
   request<DownloadRequest, DownloadResponse>({ type: "download", path })
+
+type LsRequest = {
+  path: string
+}
+
+export type FileInfo = {
+  name: string
+  isDir: boolean
+  size: number
+  mode: number
+  lastModified: number
+}
+
+type LsResponse = {
+  files: FileInfo[]
+}
+
+export const ls = async (path: string) =>
+  request<LsRequest, LsResponse>({ type: "ls", path })

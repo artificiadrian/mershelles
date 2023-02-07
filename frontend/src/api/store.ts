@@ -21,10 +21,12 @@ type InfoStore = {
   username: string
   hostname: string
   cwd: string
+  setCwd: (cwd: string) => void
 }
 
 export const useInfoStore = create<InfoStore>((set) => ({
-  username: "adrian",
-  hostname: "test",
-  cwd: "/home/x",
+  username: "?",
+  hostname: "?",
+  cwd: "?",
+  setCwd: (cwd: string) => set({ cwd }),
 }))

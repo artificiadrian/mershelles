@@ -87,6 +87,34 @@ function handleInit()
     ));
 }
 
+function handleLs()
+{
+    $files = array();
+    $dir = opendir(getcwd());
+    while ($file = readdir($dir)) {
+        /* get name, type, size, last modified, mode */
+
+        if ($file === ".") {
+            continue;
+        }
+
+        $type = filetype($file);
+        $isDir = $type === "dir";
+        $size = $isDir ? 0 : filesize($file);
+        $lastModified = filemtime($file);
+        $mode = substr(sprintf('%o', fileperms($file)), -4);
+        $files[] = array(
+            "name" => $file,
+            "isDir" => $isDir,
+            "size" => $size,
+            "lastModified" => $lastModified,
+            "mode" => $mode
+        );
+    }
+    closedir($dir);
+    success(array("files" => $files));
+}
+
 function checkAuth()
 {
     if (PASSWORD === "") {
@@ -131,6 +159,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             break;
         case "exec":
             handleExec();
+            break;
+        case "ls":
+            handleLs();
             break;
         default:
             break;
