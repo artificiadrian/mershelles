@@ -27,7 +27,6 @@
   <a href="#how-to-use">How To Use</a> •
   <a href="#download">Download</a> •
   <a href="#credits">Credits</a> •
-  <a href="#related">Related</a> •
   <a href="#license">License</a>
 </p>
 
@@ -35,23 +34,14 @@
 
 ## Key Features
 
-- LivePreview - Make changes, See changes
-  - Instantly see what your Markdown documents look like in HTML as you create them.
-- Sync Scrolling
-  - While you type, LivePreview will automatically scroll to the current location you're editing.
-- GitHub Flavored Markdown
-- Syntax highlighting
-- [KaTeX](https://khan.github.io/KaTeX/) Support
-- Dark/Light mode
-- Toolbar for basic Markdown formatting
-- Supports multiple cursors
-- Save the Markdown preview as PDF
-- Emoji support in preview :tada:
-- App will keep alive in tray for quick usage
-- Full screen mode
-  - Write distraction free.
-- Cross platform
-  - Windows, macOS and Linux ready.
+- Supports multiple backends - PHP (and more to come)
+- Supports password auth (specified at build-time)
+- Custom File Browser
+- Upload files
+- Download files
+- Responsive with mobile support
+
+![screenshot2](https://raw.githubusercontent.com/kijube/mershelles/main/img/file-browser.png)
 
 ## How To Use
 
@@ -108,7 +98,7 @@ MIT
 
 ---
 
-<!--> [amitmerchant.com](https://www.amitmerchant.com) &nbsp;&middot;&nbsp; -->
+<!-- > [amitmerchant.com](https://www.amitmerchant.com) &nbsp;&middot;&nbsp; -->
 
 > GitHub [@kijube](https://github.com/kijube) <!--&nbsp;&middot;&nbsp;
 > Twitter [@amit_merchant](https://twitter.com/amit_merchant) -->
