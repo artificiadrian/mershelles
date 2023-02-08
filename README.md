@@ -9,10 +9,6 @@
 <h4 align="center">A modern web shell built for multiple backends.</h4>
 
 <p align="center">
-Warning! Hosting this shell is a <b>security</b> vulnerability.<br/>It is intended to be used for CTFs and research purposes.
-</p>
-
-<p align="center">
   <a href="#key-features">Key Features</a> •
   <a href="#how-to-use">How To Use</a> •
   <a href="#download">Download</a> •
@@ -21,6 +17,10 @@ Warning! Hosting this shell is a <b>security</b> vulnerability.<br/>It is intend
 </p>
 
 ![screenshot](https://raw.githubusercontent.com/kijube/mershelles/main/img/shell.png)
+
+<p align="center">
+Warning! Hosting this shell is a <b>security</b> vulnerability.<br/>It is intended to be used for CTFs and research purposes.
+</p>
 
 ## Key Features
 
