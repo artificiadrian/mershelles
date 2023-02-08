@@ -2,10 +2,6 @@
 
 #region password
 $password = "@@PASSWORD@@";
-$password = ""; // todo remove
-if ($password === "@@PASS" . "WORD@@") {
-    $password = "";
-}
 define("PASSWORD", $password);
 #endregion
 
@@ -51,6 +47,13 @@ function handleAuth()
     } else {
         error("Invalid password!");
     }
+}
+
+if ($_SERVER["REQUEST_METHOD"] === "GET") {
+?>
+    @@HTML@@
+<?php
+    die();
 }
 
 # check authentication

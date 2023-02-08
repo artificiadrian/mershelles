@@ -1,6 +1,11 @@
 import { useEffect, useRef } from "react"
 import { create } from "zustand"
-import { download, exec, InitResponse } from "./api/api"
+import {
+  download,
+  exec,
+  InitResponse,
+  selectUploadFile as selectAndUploadFile,
+} from "./api/api"
 import { useCurrentCommandStore } from "./api/current-command.store"
 import { LogLine, useLogStore } from "./api/log.store"
 import { useInfoStore } from "./api/store"
@@ -36,6 +41,9 @@ export default function Shell() {
       const path = command.split(" ")[1]
       await download(path)
       log({ type: "output", output: `Trying to download ${path}` })
+      return true
+    } else if (command.startsWith("upload")) {
+      await selectAndUploadFile(log)
       return true
     }
     return false

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { create } from "zustand"
-import { download, exec, FileInfo, ls } from "./api/api"
+import { download, exec, FileInfo, ls, selectUploadFile } from "./api/api"
+import { useLogStore } from "./api/log.store"
 import { useInfoStore } from "./api/store"
 
 type FileBrowserState = {
@@ -16,8 +17,9 @@ const useFileBrowserStore = create<FileBrowserState>((set) => ({
 export default function FileBrowser() {
   const { setFiles } = useFileBrowserStore()
   const { cwd } = useInfoStore()
+  const { log } = useLogStore()
 
-  useEffect(() => {
+  function reload() {
     ls(cwd).then((response) => {
       if (response.success) {
         // order by name
@@ -31,11 +33,22 @@ export default function FileBrowser() {
         )
       }
     })
-  }, [cwd])
+  }
+
+  useEffect(reload, [cwd])
+
+  async function upload() {
+    await selectUploadFile(log, reload)
+  }
 
   return (
     <div className="text-sm md:text-base font-mono h-full flex flex-col p-2 md:p-4 pt-0 md:pt-0">
-      <Path />
+      <div className="flex flex-row items-baseline">
+        <Path />
+        <button className="hover:underline" onClick={upload}>
+          Upload
+        </button>
+      </div>
       <div className="flex-1 overflow-auto">
         <FileList />
       </div>
@@ -135,7 +148,7 @@ function Path() {
 
   return (
     <input
-      className="bg-transparent focus:ring-0 py-2"
+      className="bg-transparent focus:ring-0 py-2 flex-1"
       type="text"
       value={localCwd}
       onKeyDown={onSubmit}

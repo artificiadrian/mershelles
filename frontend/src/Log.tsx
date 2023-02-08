@@ -102,10 +102,6 @@ function LogHelp() {
         name={"upload <path>"}
         description={"Upload file to path"}
       ></CommandHelp>
-      <CommandHelp
-        name={"eval <code>"}
-        description={"Eval php code"}
-      ></CommandHelp>
     </div>
   )
 }

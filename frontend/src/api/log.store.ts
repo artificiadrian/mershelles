@@ -2,11 +2,13 @@ import { create } from "zustand"
 
 type LogState = {
   buffer: LogLine[]
-  log: (line: LogLine) => void
+  log: Logger
   clear: () => void
   onLog: (line: LogLine) => void
   setOnLog: (onLog: (line: LogLine) => void) => void
 }
+
+export type Logger = (line: LogLine) => void
 
 export type LogLineType = "input" | "error" | "output" | "help"
 

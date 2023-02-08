@@ -8,6 +8,7 @@
  * download -> download file
  */
 
+import { Logger } from "./log.store"
 import { useInfoStore } from "./store"
 
 type RequestType =
@@ -67,8 +68,7 @@ export async function request<TRequest, TResponse>(
     formData.append("file", file)
   }
 
-  const res = await fetch("http://localhost:8080", {
-    // todo change to relative path
+  const res = await fetch("/", {
     method: "POST",
     body: formData,
   })
@@ -83,7 +83,6 @@ export async function request<TRequest, TResponse>(
   if (response.success) {
     useInfoStore.setState({ cwd: response.cwd })
   }
-  console.log(response)
   return response
 }
 
@@ -128,7 +127,7 @@ type UploadRequest = {
 }
 
 type UploadResponse = {
-  path: string
+  message: string
 }
 
 export const upload = async (file: File) =>
@@ -137,7 +136,7 @@ export const upload = async (file: File) =>
 export const download = async (path: string) => {
   const form = document.createElement("form")
   form.method = "POST"
-  form.action = "http://localhost:8080" // todo change to relative path
+  form.action = "/"
   form.target = "_blank"
   form.style.display = "none"
   const addInput = (name: string, value: string) => {
@@ -172,3 +171,22 @@ type LsResponse = {
 
 export const ls = async (path: string) =>
   request<LsRequest, LsResponse>({ type: "ls", path })
+
+export const selectUploadFile = async (log: Logger, callback?: () => void) => {
+  const input = document.createElement("input")
+  input.type = "file"
+  input.style.display = "none"
+  input.onchange = async () => {
+    if (input.files && input.files.length > 0) {
+      log({ type: "output", output: `Uploading ${input.files[0].name}` })
+      const response = await upload(input.files[0])
+      if (response.success) {
+        log({ type: "output", output: response.message })
+        if (callback) callback()
+      } else log({ type: "error", error: response.error })
+    }
+  }
+  document.body.appendChild(input)
+  input.click()
+  input.remove()
+}
