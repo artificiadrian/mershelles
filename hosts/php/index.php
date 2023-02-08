@@ -210,6 +210,17 @@ function handleDownload()
     exit(0);
 }
 
+function handleUpload()
+{
+    $target_dir = getcwd() . "/";
+    $target_file = $target_dir . basename($_FILES["file"]["name"]);
+    if (move_uploaded_file($_FILES["file"]["tmp_name"], $target_file)) {
+        success(array("message" => "The file " . basename($_FILES["file"]["name"]) . " has been uploaded."));
+    } else {
+        error("Sorry, there was an error uploading your file.");
+    }
+}
+
 // handle api calls
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $type = $_POST["type"];
@@ -231,6 +242,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             break;
         case "download":
             handleDownload();
+            break;
+        case "upload":
+            handleUpload();
             break;
         default:
             break;
