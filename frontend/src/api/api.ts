@@ -68,7 +68,7 @@ export async function request<TRequest, TResponse>(
     formData.append("file", file)
   }
 
-  const res = await fetch("/", {
+  const res = await fetch(document.location.toString(), {
     method: "POST",
     body: formData,
   })
