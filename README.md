@@ -9,7 +9,7 @@
 <h4 align="center">A modern web shell built for multiple backends.</h4>
 
 <p align="center">
-Warning! Hosting this shell is a **security** vulnerability. It is intended to be used for CTFs and research purposes.
+Warning! Hosting this shell is a <b>security</b> vulnerability.<br/>It is intended to be used for CTFs and research purposes.
 </p>
 
 <p align="center">
